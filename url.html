@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Redirecting...</title>
+    <style>
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <p id="status">Redirecting...</p>
+
+    <script>
+        async function redirectFromJson() {
+            const statusEl = document.getElementById('status');
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const tag = urlParams.get('to') || window.location.hash.substring(1);
+
+            if (!tag) {
+                statusEl.textContent = "No link tag";
+                return;
+            }
+
+            try {
+                const response = await fetch('links.json?nocache=' + Date.now());
+                const links = await response.json();
+
+                const targetUrl = links[tag.toLowerCase()];
+
+                if (targetUrl) {
+                    window.location.replace(targetUrl);
+                } else {
+                    statusEl.textContent = `Link for "${tag}" not found`;
+                }
+            } catch (error) {
+                statusEl.textContent = "List load error";
+                console.error(error);
+            }
+        }
+
+        redirectFromJson();
+    </script>
+</body>
+</html>
